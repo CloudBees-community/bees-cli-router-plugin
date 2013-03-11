@@ -13,7 +13,10 @@ import org.kohsuke.args4j.Option;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -36,16 +39,24 @@ public class ConfigBuilder implements HasOptions {
         ConfigParameters config = bees.configurationParametersAsObject(appid, "application");
         ParameterMap p = config.getParameters();
         cleanOld(p);
+        buildParameters(appid, p);
+
+        p = config.getRuntimeParameters();
+        cleanOld(p);
+        buildRuntimeParameters(p);
+
+        bees.configurationParametersUpdate(appid, "application",config);
+    }
+
+    public void buildParameters(String appid, Map<String,String> p) throws IOException {
         p.put("router.appId", appid);
         p.put("bees.api.server", beesClientFactory.getApiUrl());
         p.put("bees.api.key", beesClientFactory.key);
         p.put("bees.api.secret", new String(Hex.encodeHex(beesClientFactory.secret.getBytes("UTF-8")))); // '=' in the parameter value seems to confuse the java stack
+    }
 
-        p = config.getRuntimeParameters();
-        cleanOld(p);
+    public void buildRuntimeParameters(Map<String,String> p) throws IOException {
         p.put("router.script.base64", Base64.encode(FileUtils.readFileToString(dslScript).getBytes()));
-
-        bees.configurationParametersUpdate(appid, "application",config);
     }
 
     /**

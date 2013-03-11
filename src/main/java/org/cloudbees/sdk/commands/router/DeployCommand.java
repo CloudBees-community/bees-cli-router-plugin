@@ -1,27 +1,25 @@
 package org.cloudbees.sdk.commands.router;
 
-import com.cloudbees.api.BeesClient;
-import com.cloudbees.api.config.ConfigParameters;
-import com.cloudbees.api.config.ParameterMap;
 import com.cloudbees.sdk.cli.ACommand;
 import com.cloudbees.sdk.cli.AbstractCommand;
-import com.cloudbees.sdk.cli.BeesClientFactory;
 import com.cloudbees.sdk.cli.BeesCommand;
 import com.cloudbees.sdk.cli.CLICommand;
 import com.cloudbees.sdk.cli.CommandService;
 import com.cloudbees.sdk.maven.RepositoryService;
-import com.ning.http.util.Base64;
-import org.apache.commons.io.FileUtils;
 import org.kohsuke.args4j.Option;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 /**
@@ -53,18 +51,32 @@ public class DeployCommand extends AbstractCommand {
 
         // TODO: turn appId resolution into a reusable module
 
-        // push the new configuration
-        configBuilder.update(appid);
+        List<String> args = new ArrayList<String>(Arrays.asList("app:deploy",
+                "-t", "java",
+                "-a", appid,
+                "-R", "classpath=" + findBootJar(zip),
+                "-R", "class=org.codehaus.classworlds.Launcher",
+                "-R", "JAVA_OPTS=-Dcom.cloudbees.router.impl.Main=com.cloudbees.router.impl.ApplianceMain -Dapp.port=$app_port -Dapp.home=$app_dir/app -Dclassworlds.conf=$app_dir/app/boot/classworlds.conf"));
 
+        Map<String,String> m = new HashMap<String, String>();
+        configBuilder.buildParameters(appid, m);
+        addMap(args,"-P",m);
+
+        m = new HashMap<String, String>();
+        configBuilder.buildRuntimeParameters(m);
+        addMap(args,"-R",m);
+
+        args.add(zip.getAbsolutePath());
 
         ACommand deploy = commandService.getCommand("app:deploy");
-        return deploy.run(Arrays.asList("app:deploy",
-            "-t","java",
-            "-a",appid,
-            "-R","classpath="+findBootJar(zip),
-            "-R","class=org.codehaus.classworlds.Launcher",
-            "-R","JAVA_OPTS=-Dcom.cloudbees.router.impl.Main=com.cloudbees.router.impl.ApplianceMain -Dapp.port=$app_port -Dapp.home=$app_dir/app -Dclassworlds.conf=$app_dir/app/boot/classworlds.conf",
-            zip.getAbsolutePath()));
+        return deploy.run(args);
+    }
+
+    private void addMap(List<String> args, String prefix, Map<String, String> m) {
+        for (Entry<String, String> e : m.entrySet()) {
+            args.add(prefix);
+            args.add(e.getKey()+'='+e.getValue());
+        }
     }
 
     private String findBootJar(File zip) throws IOException {
