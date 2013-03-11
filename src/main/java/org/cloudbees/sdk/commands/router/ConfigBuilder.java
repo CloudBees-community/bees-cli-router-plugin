@@ -37,12 +37,10 @@ public class ConfigBuilder implements HasOptions {
 
     public void update(String appid) throws Exception {
         ConfigParameters config = bees.configurationParametersAsObject(appid, "application");
-        ParameterMap p = config.getParameters();
-        cleanOld(p);
+        ParameterMap p = cleanOld(config.getParameters());
         buildParameters(appid, p);
 
-        p = config.getRuntimeParameters();
-        cleanOld(p);
+        p = cleanOld(config.getRuntimeParameters());
         buildRuntimeParameters(p);
 
         bees.configurationParametersUpdate(appid, "application",config);
@@ -65,12 +63,13 @@ public class ConfigBuilder implements HasOptions {
      * When different versions of the router plugin is used on the same app, this prevents
      * left-over from earlier versions to affect the runtime.
      */
-    private void cleanOld(ParameterMap p) {
+    private ParameterMap cleanOld(ParameterMap p) {
         Iterator<Entry<String, String>> itr = p.entrySet().iterator();
         while (itr.hasNext()) {
             Entry<String, String> e = itr.next();
             if (e.getKey().startsWith("router."))
                 itr.remove();
         }
+        return p;
     }
 }
