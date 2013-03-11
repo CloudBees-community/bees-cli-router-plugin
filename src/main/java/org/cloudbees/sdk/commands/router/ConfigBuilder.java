@@ -32,6 +32,7 @@ public class ConfigBuilder implements HasOptions {
     public void update(String appid) throws Exception {
         ConfigParameters config = bees.configurationParametersAsObject(appid, "application");
         ParameterMap p = config.getParameters();
+        p.put("router.appId", appid);
         p.put("router.script.base64", Base64.encode(FileUtils.readFileToString(dslScript).getBytes()));
         p.put("bees.api.server", beesClientFactory.getApiUrl());
         p.put("bees.api.key", beesClientFactory.key);
