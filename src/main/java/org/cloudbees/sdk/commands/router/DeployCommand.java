@@ -17,7 +17,12 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -51,13 +56,29 @@ public class DeployCommand extends AbstractCommand {
         // push the new configuration
         configBuilder.update(appid);
 
+
         ACommand deploy = commandService.getCommand("app:deploy");
         return deploy.run(Arrays.asList("app:deploy",
             "-t","java",
             "-a",appid,
-            "-R","classpath=boot/plexus-classworlds-2.4.jar", /* TODO: figure out the boot jar from the zip contents */
+            "-R","classpath="+findBootJar(zip),
             "-R","class=org.codehaus.classworlds.Launcher",
             "-R","JAVA_OPTS=-Dcom.cloudbees.router.impl.Main=com.cloudbees.router.impl.ApplianceMain -Dapp.port=$app_port -Dapp.home=$app_dir/app -Dclassworlds.conf=$app_dir/app/boot/classworlds.conf",
             zip.getAbsolutePath()));
+    }
+
+    private String findBootJar(File zip) throws IOException {
+        ZipFile z = new ZipFile(zip);
+        try {
+            Enumeration<? extends ZipEntry> e = z.entries();
+            while (e.hasMoreElements()) {
+                ZipEntry n = e.nextElement();
+                if (n.getName().matches("boot/plexus-classworlds-.+\\.jar"))
+                    return n.getName();
+            }
+            throw new IllegalArgumentException("No bootstrap classworlds jar found");
+        } finally {
+            z.close();
+        }
     }
 }
