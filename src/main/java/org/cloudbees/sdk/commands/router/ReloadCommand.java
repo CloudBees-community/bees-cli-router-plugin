@@ -10,6 +10,8 @@ import org.kohsuke.args4j.Option;
 import javax.inject.Inject;
 
 /**
+ * Reloads an already running router application with new router script.
+ *
  * @author Kohsuke Kawaguchi
  */
 @BeesCommand(group="Router")

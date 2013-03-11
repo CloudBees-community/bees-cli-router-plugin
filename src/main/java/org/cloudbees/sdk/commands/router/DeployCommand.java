@@ -23,6 +23,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
+ * Command to deploy the new router application.
+ *
  * @author Kohsuke Kawaguchi
  */
 @BeesCommand(group="Router")
