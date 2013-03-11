@@ -2,7 +2,7 @@ package org.cloudbees.sdk.commands.router;
 
 import com.cloudbees.api.BeesClient;
 import com.cloudbees.api.config.ConfigParameters;
-import com.cloudbees.sdk.api.BeesAPIClient;
+import com.cloudbees.api.config.ParameterMap;
 import com.cloudbees.sdk.cli.ACommand;
 import com.cloudbees.sdk.cli.AbstractCommand;
 import com.cloudbees.sdk.cli.BeesClientFactory;
@@ -12,7 +12,6 @@ import com.cloudbees.sdk.cli.CommandService;
 import com.cloudbees.sdk.maven.RepositoryService;
 import com.ning.http.util.Base64;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.kohsuke.args4j.Option;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
@@ -32,12 +31,6 @@ public class DeployCommand extends AbstractCommand {
     @Inject
     RepositoryService repository;
 
-    @Inject
-    BeesClient bees;
-
-    @Inject
-    BeesClientFactory beesClientFactory;    // because this participates in the options parsing
-
     @Option(name="--router",metaVar="groupId:artifactId:packaging:classifier:version",
             usage="Override the router bundle to use (advanced)")
     public String routerGav = "com.cloudbees.router:cloudbees-router:zip:dist:LATEST";
@@ -45,8 +38,8 @@ public class DeployCommand extends AbstractCommand {
     @Option(name="-a",aliases="--appid",usage="Application ID that the router will run as",required=true)
     public String appid;
 
-    @Option(name="-s",aliases="--dsl",usage="Groovy router DSL script")
-    public File dslScript;
+    @Inject
+    ConfigBuilder configBuilder;
 
     @Override
     public int main() throws Exception {
@@ -56,11 +49,15 @@ public class DeployCommand extends AbstractCommand {
         // TODO: turn appId resolution into a reusable module
 
         // push the new configuration
-        ConfigParameters config = bees.configurationParametersAsObject(appid, "application");
-        config.getParameters().put("script.base64", Base64.encode(FileUtils.readFileToString(dslScript).getBytes()));
-        bees.configurationParametersUpdate(appid, "application",config);
+        configBuilder.update(appid);
 
         ACommand deploy = commandService.getCommand("app:deploy");
-        return deploy.run(Arrays.asList(appid,zip.getAbsolutePath()));
+        return deploy.run(Arrays.asList("app:deploy",
+            "-t","java",
+            "-a",appid,
+            "-R","classpath=boot/plexus-classworlds-2.4.jar", /* TODO: figure out the boot jar from the zip contents */
+            "-R","class=org.codehaus.classworlds.Launcher",
+            "-R","JAVA_OPTS=-Dcom.cloudbees.router.impl.Main=com.cloudbees.router.impl.ApplianceMain -Dapp.port=$app_port -Dapp.home=$app_dir/app -Dclassworlds.conf=$app_dir/app/boot/classworlds.conf",
+            zip.getAbsolutePath()));
     }
 }
