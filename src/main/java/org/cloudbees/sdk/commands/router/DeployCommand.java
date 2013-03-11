@@ -79,6 +79,9 @@ public class DeployCommand extends AbstractCommand {
         }
     }
 
+    /**
+     * Locates the bootstrap classworlds jar from the bundle
+     */
     private String findBootJar(File zip) throws IOException {
         ZipFile z = new ZipFile(zip);
         try {
