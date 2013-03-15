@@ -14,10 +14,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.cloudbees.sdk</groupId>
+            <groupId>com.cloudbees</groupId>
             <artifactId>bees-maven-components</artifactId>
-            <version>1.3.2-SNAPSHOT</version>
-            <scope>provided</scope>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
           <groupId>com.cloudbees</groupId>
