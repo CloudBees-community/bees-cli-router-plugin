@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.cloudbees</groupId>
+    <artifactId>cloudbees-oss-parent</artifactId>
+    <version>2</version>
+  </parent>
+
+
+  <groupId>org.cloudbees.sdk.plugins</groupId>
+  <artifactId>router-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Commands for the router app</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.cloudbees.sdk</groupId>
+      <artifactId>bees-api</artifactId>
+      <version>1.3.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>com.cloudbees</groupId>
-      <artifactId>cloudbees-oss-parent</artifactId>
-      <version>2</version>
-    </parent>
+      <artifactId>bees-maven-components</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudbees</groupId>
+      <artifactId>cloudbees-api-client</artifactId>
+      <version>1.5.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-    <groupId>org.cloudbees.sdk.plugins</groupId>
-    <artifactId>router-plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>Commands for the router app</name>
-
-    <dependencies>
-      <dependency>
-        <groupId>com.cloudbees.sdk</groupId>
-        <artifactId>bees-api</artifactId>
-        <version>1.3.2-SNAPSHOT</version>
-      </dependency>
-        <dependency>
-            <groupId>com.cloudbees</groupId>
-            <artifactId>bees-maven-components</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-          <groupId>com.cloudbees</groupId>
-          <artifactId>cloudbees-api-client</artifactId>
-          <version>1.5.0-SNAPSHOT</version>
-      </dependency>
-    </dependencies>
+  <scm>
+    <connection>scm:git:git://github.com/cloudbees/bees-cli-${project.artifactId}.git</connection>
+    <developerConnection>scm:git:git@github.com:cloudbees/bees-cli-${project.artifactId}.git</developerConnection>
+    <url>http://github.com/cloudbees/bees-cli-${project.artifactId}</url>
+  </scm>
 </project>
