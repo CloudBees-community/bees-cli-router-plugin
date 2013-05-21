@@ -18,17 +18,17 @@
     <dependency>
       <groupId>com.cloudbees.sdk</groupId>
       <artifactId>bees-api</artifactId>
-      <version>1.3.2-SNAPSHOT</version>
+      <version>1.3.5</version>
     </dependency>
     <dependency>
       <groupId>com.cloudbees</groupId>
       <artifactId>bees-maven-components</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>com.cloudbees</groupId>
       <artifactId>cloudbees-api-client</artifactId>
-      <version>1.5.0-SNAPSHOT</version>
+      <version>1.5.0</version>
     </dependency>
   </dependencies>
 
